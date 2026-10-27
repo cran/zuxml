@@ -1,0 +1,73 @@
+Package: zuxml
+Title: Small XML Parser and Document Tree
+Version: 0.1.0
+Authors@R: c(
+    person("Pedro", "Baltazar", , "pedrobtz@gmail.com",
+           role = c("aut", "cre", "cph")),
+    person("Clark", "Cooper", role = "ctb",
+           comment = "author of the bundled Expat library"),
+    person("Fred L.", "Drake, Jr.", role = "ctb",
+           comment = "author of the bundled Expat library"),
+    person("Greg", "Stein", role = "ctb",
+           comment = "author of the bundled Expat library"),
+    person("James", "Clark", role = "ctb",
+           comment = "author of the bundled Expat library"),
+    person("Karl", "Waclawek", role = "ctb",
+           comment = "author of the bundled Expat library"),
+    person("Rhodri", "James", role = "ctb",
+           comment = "author of the bundled Expat library"),
+    person("Sebastian", "Pipping", role = "ctb",
+           comment = "author of the bundled Expat library and contributor to siphash.h"),
+    person("Steven", "Solie", role = "ctb",
+           comment = "author of the bundled Expat library"),
+    person("William", "Ahern", role = "ctb",
+           comment = "derived the bundled SipHash implementation (siphash.h)"),
+    person("Jean-Philippe", "Aumasson", role = "ctb",
+           comment = "co-author of the SipHash reference implementation (siphash.h)"),
+    person("Daniel J.", "Bernstein", role = "ctb",
+           comment = "co-author of the SipHash reference implementation (siphash.h)"),
+    person("Victor", "Stinner", role = "ctb",
+           comment = "contributor to siphash.h"))
+Description: Reads, navigates, and writes XML documents using a bundled
+    copy of the 'Expat' parser (<https://libexpat.github.io/>), so that no
+    system XML library is required. Documents are parsed into a faithful
+    immutable tree exposed through a small vectorized navigation
+    interface. Parsing is strict by default: document type
+    declarations are rejected, external entity resolution is not compiled
+    in, and configurable limits bound nesting depth and memory use. A
+    registered C interface allows other packages to parse XML without
+    linking against the parser themselves, and to feed it incrementally
+    so that a large document need not be held in memory all at once.
+License: MIT + file LICENSE
+Copyright: See inst/COPYRIGHTS.
+URL: https://github.com/pedrobtz/zuxml,
+        https://pedrobtz.github.io/zuxml/
+BugReports: https://github.com/pedrobtz/zuxml/issues
+Depends: R (>= 4.1)
+Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
+Config/testthat/edition: 3
+VignetteBuilder: knitr
+Encoding: UTF-8
+Config/roxygen2/version: 8.1.1
+NeedsCompilation: yes
+Packaged: 2026-10-17 08:36:28 UTC; pbtz
+Author: Pedro Baltazar [aut, cre, cph],
+  Clark Cooper [ctb] (author of the bundled Expat library),
+  Fred L. Drake, Jr. [ctb] (author of the bundled Expat library),
+  Greg Stein [ctb] (author of the bundled Expat library),
+  James Clark [ctb] (author of the bundled Expat library),
+  Karl Waclawek [ctb] (author of the bundled Expat library),
+  Rhodri James [ctb] (author of the bundled Expat library),
+  Sebastian Pipping [ctb] (author of the bundled Expat library and
+    contributor to siphash.h),
+  Steven Solie [ctb] (author of the bundled Expat library),
+  William Ahern [ctb] (derived the bundled SipHash implementation
+    (siphash.h)),
+  Jean-Philippe Aumasson [ctb] (co-author of the SipHash reference
+    implementation (siphash.h)),
+  Daniel J. Bernstein [ctb] (co-author of the SipHash reference
+    implementation (siphash.h)),
+  Victor Stinner [ctb] (contributor to siphash.h)
+Maintainer: Pedro Baltazar <pedrobtz@gmail.com>
+Repository: CRAN
+Date/Publication: 2026-10-27 18:00:02 UTC

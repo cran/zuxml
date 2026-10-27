@@ -1,0 +1,83 @@
+test_that("parsing is independent of chunk boundaries", {
+  for (nm in names(fixtures)) {
+    whole <- evs(fixtures[[nm]])
+    expect_identical(evs(fixtures[[nm]]), whole, info = nm)
+    for (k in c(1L, 2L, 3L, 7L, 31L, 4096L)) {
+      expect_identical(evs(fixtures[[nm]], chunk = k), whole,
+                       info = paste(nm, "chunk", k))
+    }
+  }
+})
+
+test_that("parsing is independent of random chunk boundaries", {
+  set.seed(20260908)
+  for (nm in names(fixtures)) {
+    whole <- evs(fixtures[[nm]])
+    for (trial in 1:5) {
+      k <- sample.int(nchar(fixtures[[nm]], type = "bytes") + 1L, 1L)
+      expect_identical(evs(fixtures[[nm]], chunk = k), whole,
+                       info = paste(nm, "random chunk", k))
+    }
+  }
+})
+
+test_that("splitting inside a multibyte UTF-8 sequence is safe", {
+  # One byte at a time guarantees every multibyte character is split.
+  doc <- "<a>é中\U0001F600</a>"
+  expect_identical(evs(doc, chunk = 1L), evs(doc))
+  expect_identical(ev(doc, chunk = 1L)$status, "ok")
+})
+
+test_that("splitting inside specific lexical constructs is safe", {
+  targets <- c(
+    tag_open   = "<abcdef/>",
+    attr_name  = '<a longattributename="v"/>',
+    attr_value = '<a x="a long attribute value here"/>',
+    entity     = "<a>&amp;&#12345;</a>",
+    cdata      = "<a><![CDATA[payload]]></a>",
+    close_tag  = "<abcdef>x</abcdef>",
+    comment    = "<a><!-- a fairly long comment --></a>",
+    pi         = "<a><?target a fairly long instruction?></a>"
+  )
+  for (nm in names(targets)) {
+    whole <- evs(targets[[nm]])
+    n <- nchar(targets[[nm]], type = "bytes")
+    for (k in seq_len(n)) {
+      expect_identical(evs(targets[[nm]], chunk = k), whole,
+                       info = paste(nm, "split at", k))
+    }
+  }
+})
+
+test_that("an error is reported identically regardless of chunking", {
+  bad <- "<a><b></a>"
+  base <- ev(bad)
+  for (k in c(1L, 2L, 5L)) {
+    r <- ev(bad, chunk = k)
+    expect_identical(r$status, base$status, info = paste("chunk", k))
+    expect_identical(r$byte_offset, base$byte_offset, info = paste("chunk", k))
+  }
+})
+
+test_that("chunk boundaries are still irrelevant when comments or PIs are dropped", {
+  # Text coalescing across a dropped node is new, and it interacts with the
+  # buffering that makes chunk size irrelevant: text now spans a node that
+  # used to flush it. Criterion 2 has to hold in that combination too.
+  ti <- function(...) zuxml:::zux_tree_info(...)$dump
+  docs <- c(
+    "<a>aaa<!--comment-->bbb</a>",
+    "<a>aaa<?pi data?>bbb</a>",
+    "<a>x<!--c-->y<!--d-->z<?p q?>w</a>",
+    paste0("<a>", strrep("u", 300), "<!--c-->", strrep("v", 300), "</a>")
+  )
+  settings <- list(list(comments = FALSE), list(pis = FALSE),
+                   list(comments = FALSE, pis = FALSE))
+  for (d in docs) for (o in settings) {
+    whole <- do.call(ti, c(list(d), o))
+    for (k in c(1L, 2L, 3L, 7L, 31L, 4096L)) {
+      expect_identical(do.call(ti, c(list(d), list(chunk = k), o)), whole,
+                       info = sprintf("%s chunk=%d %s", substr(d, 1, 24), k,
+                                      paste(names(o), collapse = ",")))
+    }
+  }
+})
